@@ -205,6 +205,7 @@ chmod +x setup.sh run.sh
 ./setup.sh
 
 # Run this to start the tool everytime
+./run.sh
 ```
 
 ### Supported Linux Distributions & Package Managers
