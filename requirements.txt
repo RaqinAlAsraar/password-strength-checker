@@ -1,0 +1,4 @@
+# CodeNova Internship Batch 01 - Task 1: Password Strength Checker
+# Python Dependencies
+PyQt6>=6.5.0
+pytest>=7.4.0

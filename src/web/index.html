@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeNova • Password Security & Entropy Auditor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">CodeNova <span class="brand-tag">Cybersecurity</span></h1>
+          <p class="brand-subtitle">Task 1 • Password Strength & Entropy Auditor</p>
+        </div>
+      </div>
+      <div class="privacy-badge">
+        <span class="pulse-dot"></span>
+        <span>Volatile Memory Only (Zero Disk • Offline)</span>
+      </div>
+    </header>
+
+    <!-- Navigation Segments -->
+    <nav class="nav-segmented">
+      <button class="nav-btn active" id="tab-auditor-btn" onclick="switchTab('auditor')">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        Password Auditor
+      </button>
+      <button class="nav-btn" id="tab-generator-btn" onclick="switchTab('generator')">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        Secure Generator
+      </button>
+      <button class="nav-btn" id="tab-theory-btn" onclick="switchTab('theory')">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Math & Security Model
+      </button>
+    </nav>
+
+    <!-- TAB 1: AUDITOR -->
+    <main class="tab-content active" id="tab-auditor">
+      <!-- Hero Input Card -->
+      <section class="card input-card">
+        <label for="password-input" class="input-label">Enter Password to Audit</label>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            id="password-input" 
+            placeholder="Type or paste password..." 
+            autocomplete="off" 
+            spellcheck="false"
+            autofocus
+          />
+          <div class="input-actions">
+            <button class="icon-btn" id="toggle-vis-btn" title="Show / Hide Password" onclick="toggleVisibility()">
+              <svg id="eye-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button class="icon-btn" title="Copy to Clipboard" onclick="copyPassword()">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+            <button class="icon-btn" title="Clear Input" onclick="clearInput()">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Strength Score Bar & Status -->
+        <div class="strength-meter-container">
+          <div class="strength-header">
+            <span class="meter-label">Password Strength:</span>
+            <span class="tier-badge" id="tier-badge">WAITING FOR INPUT</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Crack Time Highlight Banner -->
+        <div class="crack-time-banner" id="crack-banner">
+          <span class="crack-icon">⏱️</span>
+          <div class="crack-text">
+            <span>Estimated GPU Crack Time:</span>
+            <strong id="fast-crack-time">Instant (&lt; 1 ms)</strong>
+            <small id="crack-subtext">(Attacker testing 10 Billion hashes / sec)</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- Checklist & Variety Chips -->
+      <section class="card chips-card">
+        <h3 class="section-title">Character Variety & Standard Rules</h3>
+        <div class="chips-grid">
+          <div class="chip" id="chip-len">
+            <span class="chip-icon">✗</span>
+            <span>Length: <strong id="val-len">0</strong> (14+ optimal)</span>
+          </div>
+          <div class="chip" id="chip-upper">
+            <span class="chip-icon">✗</span>
+            <span>Uppercase (A-Z): <strong id="val-upper">0</strong></span>
+          </div>
+          <div class="chip" id="chip-lower">
+            <span class="chip-icon">✗</span>
+            <span>Lowercase (a-z): <strong id="val-lower">0</strong></span>
+          </div>
+          <div class="chip" id="chip-digits">
+            <span class="chip-icon">✗</span>
+            <span>Numbers (0-9): <strong id="val-digits">0</strong></span>
+          </div>
+          <div class="chip" id="chip-symbols">
+            <span class="chip-icon">✗</span>
+            <span>Symbols: <strong id="val-symbols">0</strong></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Threat & Vulnerability Findings -->
+      <section class="card alerts-card" id="card-threats">
+        <h3 class="section-title">Detected Vulnerabilities & Threat Patterns</h3>
+        <div class="threats-list" id="threats-container">
+          <div class="empty-state">Enter a password above to audit security findings.</div>
+        </div>
+      </section>
+
+      <!-- Actionable Suggestions -->
+      <section class="card recommendations-card" id="card-suggestions">
+        <h3 class="section-title">Actionable Strengthening Advice</h3>
+        <ul class="suggestions-list" id="suggestions-container">
+          <li class="suggestion-item">Enter a credential to view specific suggestions.</li>
+        </ul>
+      </section>
+
+      <!-- Collapsible Technical Math Deep Dive -->
+      <details class="card math-accordion">
+        <summary class="accordion-header">
+          <span>📐 Technical Information Theory & Shannon Entropy Details</span>
+          <span class="accordion-arrow">▼</span>
+        </summary>
+        <div class="accordion-body">
+          <div class="math-grid">
+            <div class="math-card">
+              <span class="math-label">Shannon Entropy (H)</span>
+              <strong class="math-val" id="shannon-val">0.00 bits</strong>
+              <small id="shannon-rate">0.00 bits / char</small>
+            </div>
+            <div class="math-card">
+              <span class="math-label">Keyspace Combinatorial Entropy</span>
+              <strong class="math-val" id="keyspace-val">0.00 bits</strong>
+              <small id="keyspace-pool">Pool size: 0 chars</small>
+            </div>
+            <div class="math-card">
+              <span class="math-label">Argon2 / Bcrypt Slow Hash</span>
+              <strong class="math-val" id="slow-crack-time">Instant</strong>
+              <small>10,000 hashes / sec</small>
+            </div>
+            <div class="math-card">
+              <span class="math-label">Online Brute Force</span>
+              <strong class="math-val" id="online-crack-time">Instant</strong>
+              <small>100 guesses / sec (Web API)</small>
+            </div>
+          </div>
+          <p class="math-note">
+            Formula: \( H = - \sum p(x_i) \log_2 p(x_i) \). Evaluates information density and penalizes repetition in volatile RAM.
+          </p>
+        </div>
+      </details>
+    </main>
+
+    <!-- TAB 2: GENERATOR -->
+    <main class="tab-content" id="tab-generator">
+      <section class="card generator-card">
+        <h2 class="section-title">Cryptographically Strong Credential Generator</h2>
+        <p class="section-subtitle">
+          Uses Python's hardware-backed pseudo-random number generator (<code>secrets</code> module).
+        </p>
+
+        <!-- Generated Credential Box -->
+        <div class="generated-display-box">
+          <div class="generated-text" id="generated-pwd-text">Click generate below</div>
+          <div class="generated-actions">
+            <button class="btn btn-secondary" onclick="copyGenerated()">📋 Copy</button>
+            <button class="btn btn-secondary" onclick="useInAuditor()">🔍 Audit This</button>
+          </div>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="gen-mode-toggle">
+          <label class="radio-label">
+            <input type="radio" name="gen-mode" value="random" checked onchange="onGenModeChange()">
+            <span>Random Alphanumeric & Symbols</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="gen-mode" value="passphrase" onchange="onGenModeChange()">
+            <span>Diceware Multi-Word Passphrase</span>
+          </label>
+        </div>
+
+        <!-- Slider -->
+        <div class="slider-control">
+          <div class="slider-header">
+            <span id="slider-label">Password Length:</span>
+            <span class="slider-value-bubble" id="slider-val-bubble">18</span>
+          </div>
+          <input type="range" id="length-slider" min="8" max="40" value="18" oninput="onSliderInput(this.value)">
+        </div>
+
+        <!-- Options Checkboxes -->
+        <div class="checkbox-grid" id="random-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-upper" checked onchange="generateCredential()">
+            <span>Uppercase Letters (A-Z)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-lower" checked onchange="generateCredential()">
+            <span>Lowercase Letters (a-z)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-digits" checked onchange="generateCredential()">
+            <span>Numbers (0-9)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-symbols" checked onchange="generateCredential()">
+            <span>Special Characters (!@#$%^&*)</span>
+          </label>
+        </div>
+
+        <!-- Passphrase options (hidden initially) -->
+        <div class="checkbox-grid hidden" id="passphrase-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-pp-cap" checked onchange="generateCredential()">
+            <span>Capitalize Each Word</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-pp-num" checked onchange="generateCredential()">
+            <span>Append Random Digits</span>
+          </label>
+        </div>
+
+        <button class="btn btn-primary generate-main-btn" onclick="generateCredential()">
+          ⚡ Generate New Credential
+        </button>
+      </section>
+    </main>
+
+    <!-- TAB 3: THEORY & ACCEPTANCE -->
+    <main class="tab-content" id="tab-theory">
+      <section class="card theory-card">
+        <h2 class="section-title">Defensive Security Principles & Mathematical Models</h2>
+        
+        <div class="theory-block">
+          <h3>1. Shannon Entropy Formula</h3>
+          <p>
+            Shannon entropy measures the average rate of information produced per character:
+          </p>
+          <div class="code-box">
+            H = - ∑ [ p(x) * log₂(p(x)) ]   (bits/character)<br>
+            Total Shannon Entropy = Length * H   (bits)
+          </div>
+          <p>
+            This model directly penalizes redundant characters (e.g., <code>aaaaaa</code> has 0 bits of Shannon entropy).
+          </p>
+        </div>
+
+        <div class="theory-block">
+          <h3>2. Keyspace Combinatorial Search Space</h3>
+          <p>
+            Brute force complexity depends on the character variety pool \(|R|\):
+          </p>
+          <div class="code-box">
+            E = Length * log₂(|R|)   (Keyspace bits)<br>
+            Total Search Space = |R|^Length = 2^E
+          </div>
+          <p>
+            A full 95-character alphanumeric and symbol set yields \( \log_2(95) \approx 6.57 \) bits per character.
+          </p>
+        </div>
+
+        <div class="theory-block">
+          <h3>3. Zero-Persistence Security Protocol</h3>
+          <p>
+            As verified by CodeNova unit tests:
+          </p>
+          <ul>
+            <li><strong>Volatile Memory Only:</strong> Evaluated strictly in transient RAM variables.</li>
+            <li><strong>Zero Persistent Storage:</strong> No files are written, logged, or appended to disk.</li>
+            <li><strong>Zero Network Calls:</strong> 100% offline local processing with no external telemetry.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>CodeNova Internship Program • Batch 01 • Cybersecurity Track</span>
+      <span>Developed by <strong>Ali Abbas Haidar</strong> (@raqinalasraar)</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
