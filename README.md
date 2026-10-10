@@ -320,7 +320,7 @@ python3 -m unittest discover -s tests -v
 
 - **Author:** Ali Abbas Haidar (Raqin Al-Asraar)
 
-- **Alias / GitHub:** [`@raqinalasraar`](https://github.com/raqinalasraar) (`raqin`)
+- **Alias / GitHub:** [`@raqinalasraar`](https://github.com/raqinalasraar) 
 
 - **Contact:** `aliabbashaidar313@gmail.com`
 
